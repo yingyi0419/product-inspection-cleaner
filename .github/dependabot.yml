@@ -1,12 +1,7 @@
-import { defineConfig } from "vite";
-import react from "@vitejs/plugin-react";
+version: 2
 
-// 使用相對路徑，部署到 GitHub Pages 專案網址或自訂網域都能載入靜態資源。
-export default defineConfig({
-  plugins: [react()],
-  base: "./",
-  build: {
-    outDir: "dist",
-    sourcemap: false,
-  },
-});
+updates:
+  - package-ecosystem: "npm"
+    directory: "/"
+    schedule:
+      interval: "weekly"
