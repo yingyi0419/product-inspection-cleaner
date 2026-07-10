@@ -1,0 +1,123 @@
+# 產品簡易抽驗紀錄表清理與診斷工具
+
+這是一個純前端 React + Vite 工具，用於清理「產品簡易抽驗紀錄表」Excel 報表，支援單檔、多檔、資料匣與拖拉上傳。
+
+## 核心功能
+
+- 使用 `FileReader` 讀取使用者上傳的 Excel。
+- 使用 SheetJS 相容 API `XLSX.read` 解析活頁簿；此部署版改用 `@e965/xlsx@0.20.3`，避免 npm 官方 `xlsx@0.18.5` 的已知安全警示。
+- 使用 `XLSX.utils.sheet_to_json(..., { header: 1 })` 以二維陣列解析非標準報表。
+- 自動讀取多工作表，排除彙整報告、空白表、無效表。
+- 偵測橫向廠商區塊，轉成一列一筆樣本的直向標準資料表。
+- 支援廠商母公司 / 子公司合併統計，例如 `泰安(泰立富)` 會歸入 `泰安` 統計。
+- 支援 `67..2` 這類小數點手誤自動修正為 `67.2`，並留下人工確認備註。
+- 產出週別統計、月統計、老闆彙總表、KPI、異常資料清單與清理後明細表。
+- 使用 `XLSX.writeFile` 或瀏覽器 Blob 備援下載整理後 Excel。
+- 已通過 `npm audit --audit-level=high`，目前沒有 high / critical npm audit 警示。
+
+## 資安與隱私
+
+本工具是純前端靜態網站：Excel 檔案在使用者自己的瀏覽器中解析，不需要後端、不需要資料庫，也沒有上傳 API。
+
+請注意：
+
+- 不要把公司真實 Excel 放到 GitHub repository。
+- 不要把含有個資、機密、未授權資料的檔案分享給他人。
+- 若資料高度敏感，建議部署在公司內網或受控環境。
+
+詳見：`docs/SECURITY_AND_PRIVACY.md`
+
+## 本機執行
+
+```bash
+npm install
+npm run dev
+```
+
+開啟：
+
+```text
+http://localhost:5173/
+```
+
+## 建置正式版
+
+```bash
+npm run build
+npm run preview
+```
+
+Vite 會輸出 `dist` 資料夾，可部署到靜態網站平台。
+
+## GitHub Pages 部署
+
+### 1. 建立 GitHub repository
+
+建議名稱：
+
+```text
+product-inspection-cleaner
+```
+
+### 2. 上傳整個專案
+
+請上傳這些內容：
+
+```text
+.github/
+docs/
+public/
+src/
+index.html
+package.json
+package-lock.json
+vite.config.js
+README.md
+```
+
+不要上傳公司真實 Excel 檔。
+
+### 3. 到 GitHub 開啟 Pages
+
+進入 repository：
+
+```text
+Settings → Pages → Build and deployment → Source → GitHub Actions
+```
+
+### 4. 推送到 main
+
+GitHub Actions 會自動執行：
+
+```text
+npm ci → npm run build → 發佈 dist 到 GitHub Pages
+```
+
+### 5. 取得網址
+
+部署完成後網址通常是：
+
+```text
+https://你的帳號.github.io/product-inspection-cleaner/
+```
+
+## Git 指令範例
+
+```bash
+git init
+git add .
+git commit -m "Initial deployable version"
+git branch -M main
+git remote add origin https://github.com/你的帳號/product-inspection-cleaner.git
+git push -u origin main
+```
+
+## 重要提醒
+
+`vite.config.js` 目前使用：
+
+```js
+base: "./"
+```
+
+因此可部署在 GitHub Pages 專案網址或自訂網域，不需要另外修改 repository 名稱路徑。
